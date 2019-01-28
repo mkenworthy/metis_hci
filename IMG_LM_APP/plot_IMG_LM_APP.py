@@ -7,13 +7,15 @@ from matplotlib import pyplot as plt
 if __name__ == "__main__":
 
 
-        amp = read_fits('ELT_pupil_downsampled_Lp.fits')
-        phase = read_fits('METIS_vAPP_PDR_L_grating.fits')
+###        amp = read_fits('L/ELT_pupil_downsampled_Lp.fits')
+        phase = read_fits('L/METIS_vAPP_PDR_L_grating.fits')
 
-        amp = np.transpose(amp)
-
-        aper1 = amp * np.exp(-1j * phase)
-        aper2 = amp * np.exp(1j * phase)
+        # amplitude mask is NOT the antialiased mask in the L/ and M/
+        # directories.
+        amp = (np.abs(phase)>0)
+        write_fits(amp.astype(int), "L_ELT_binary_pupil.fits")
+        aper1 = (np.abs(phase)>0) * np.exp(-1j * phase)
+        aper2 = (np.abs(phase)>0) * np.exp(1j * phase)
         aper3 = amp + 0j
  #       N = 512
         D = 39.2 # meters
@@ -58,8 +60,10 @@ if __name__ == "__main__":
                 wf2_foc = prop.forward(wf2)
                 wf3 = Wavefront(aper33, wavelength)
                 wf3_foc = prop.forward(wf3)
+
+                fname = 'IMG_APP_PSF_{:.1f}.pdf'.format(wavelength*1e6)
                 ti = 'IMG APP at {:.1f} microns'.format(wavelength*1e6)
-                print(ti)
+
                 plt.clf()
                 # Plot it with the on_sky_grid coordinates
                 psf_tot = wf1_foc.power + wf2_foc.power + 0.03 * wf3_foc.power
@@ -69,4 +73,7 @@ if __name__ == "__main__":
                 plt.ylabel('DEC (arcsec)')
                 plt.title(ti)
                 plt.draw()
+
+                plt.savefig(fname)
+
                 plt.pause(2)
