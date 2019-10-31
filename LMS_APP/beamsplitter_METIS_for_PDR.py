@@ -32,7 +32,7 @@ for wavelength in [3e-6, 5e-6]:
 
 	plt.figure(1)
 	for grating in [30]:
-		for i, r in enumerate([1,1.5]):
+		for i, r in enumerate([-1,1.5]): # negative radius r is 'open aperture'
 			wf = Wavefront(Field(amp.ravel(), pupil_grid))
 			wf.electric_field *= np.exp(2j * np.pi * pupil_grid.y * (-12.5 - 2.2))
 			wf.electric_field *= np.exp(2j * np.pi * pupil_grid.x * -grating)
